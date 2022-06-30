@@ -1,0 +1,54 @@
+{
+  "name": "asl-path-validator",
+  "version": "0.1.0",
+  "description": "Validates the path expressions for the Amazon States Language",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "npx tsc && npm run test",
+    "lint": "npx eslint . --max-warnings 0 --ext ts",
+    "test": "npx jest",
+    "generate": "mkdirp src/generated && ./node_modules/.bin/peggy -o src/generated/aslPaths.js src/aslPaths.pegjs",
+    "clean": "rimraf dist src/generated"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/massfords/asl-path-validator.git"
+  },
+  "keywords": [
+    "asl",
+    "amazon states language",
+    "aws",
+    "step functions",
+    "state machine"
+  ],
+  "author": "Mark Ford",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/massfords/asl-path-validator/issues"
+  },
+  "homepage": "https://github.com/massfords/asl-path-validator#readme",
+  "devDependencies": {
+    "@types/jest": "^28.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^26.5.3",
+    "eslint-plugin-prettier": "^4.1.0",
+    "jest": "^28.1.1",
+    "jest-junit": "^14.0.0",
+    "mkdirp": "^1.0.4",
+    "peggy": "^2.0.1",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "jsonpath-plus": "^7.0.0"
+  }
+}
