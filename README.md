@@ -81,7 +81,7 @@ This is explicitly noted in the AWS docs. The relevant fields to examine are **P
 | `*`                     | Wildcard. Available anywhere a name or numeric are required.     | :white_check_mark: | :x:                |
 | `..`                    | Deep scan. Available anywhere a name is required.                | :white_check_mark: | :x:                |
 | `.<name>`               | Dot-notated child matches on the existence of the child.         | :white_check_mark: | :white_check_mark: |
-| `['<name>']`            | Bracket-notated child                                            | :white_check_mark: | :x:                |
+| `['<name>']`            | Bracket-notated child                                            | :white_check_mark: | :white_check_mark: |
 | `[<number>]`            | Array index                                                      | :white_check_mark: | :white_check_mark: |
 | `[<number>, <number>)]` | Multiple array indexes                                           | :white_check_mark: | :x:                |
 | `[start:end]`           | Array slice operator (one of start/end is optional)              | :white_check_mark: | :x:                |
