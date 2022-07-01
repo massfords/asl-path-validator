@@ -37,6 +37,7 @@ describe("tests for the ajv custom formatters", () => {
       "https://asl-path-validator.cloud/example.json#",
       input
     );
+    expect(ajv.errors ?? []).toStrictEqual([]);
     expect(result).toBe(true);
   });
 
@@ -73,6 +74,16 @@ describe("tests for the ajv custom formatters", () => {
           static: {
             "nested.dynamic.path1.$": "not a valid path",
             static2: "ok",
+          },
+        },
+      },
+    },
+    {
+      Parameters: {
+        deeply_nested: {
+          static$: {
+            "nested.dynamic.path1.$": "not a valid path",
+            static2$: "ok",
           },
         },
       },
