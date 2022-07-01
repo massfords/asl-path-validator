@@ -245,10 +245,10 @@ function peg$parse(input, options) {
   var peg$e33 = peg$otherExpectation("whitespace");
   var peg$e34 = peg$classExpectation([" ", "\t", "\n"], false, false);
 
-  var peg$f0 = function(sub) {return {node: "$", sub, isRoot:true}};
-  var peg$f1 = function(sub) {return {node: "$$", sub, isRoot:true}};
-  var peg$f2 = function(sub) {return {node: "$", sub}};
-  var peg$f3 = function(sub) {return {node: "$$", sub}};
+  var peg$f0 = function(sub) {return {node: "$$", sub, isRoot:true}};
+  var peg$f1 = function(sub) {return {node: "$", sub, isRoot:true}};
+  var peg$f2 = function(sub) {return {node: "$$", sub}};
+  var peg$f3 = function(sub) {return {node: "$", sub}};
   var peg$f4 = function(sub) {return {node: "@", sub}};
   var peg$f5 = function(id, sub) {return {axis: "..", id, sub}};
   var peg$f6 = function(brackets, sub) {return {axis: "..", brackets, sub}};

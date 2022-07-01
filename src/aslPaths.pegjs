@@ -1,11 +1,11 @@
 jsonpath
-   = CONTEXT_ROOT_VALUE sub:subscript? _  {return {node: "$", sub, isRoot:true}}
-   / ROOT_VALUE sub:subscript? _  {return {node: "$$", sub, isRoot:true}}
+   = CONTEXT_ROOT_VALUE sub:subscript? _  {return {node: "$$", sub, isRoot:true}}
+   / ROOT_VALUE sub:subscript? _  {return {node: "$", sub, isRoot:true}}
    / intrinsic_function
 
 jsonpath_
-   = CONTEXT_ROOT_VALUE sub:subscript? {return {node: "$", sub}}
-   / ROOT_VALUE sub:subscript? {return {node: "$$", sub}}
+   = CONTEXT_ROOT_VALUE sub:subscript? {return {node: "$$", sub}}
+   / ROOT_VALUE sub:subscript? {return {node: "$", sub}}
    / CURRENT_VALUE sub:subscript? {return {node: "@", sub}}
    / intrinsic_function
 
