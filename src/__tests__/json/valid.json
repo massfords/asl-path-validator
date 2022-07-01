@@ -1,0 +1,18 @@
+{
+  "Type": "Example",
+
+  "OutputPath": "$.valid..path",
+
+  "InputPath": "$.valid..path",
+
+  "ResultPath": "$.valid.ref.path",
+
+  "TimeoutSecondsPath": "$.valid.ref.path",
+
+  "Parameters": {
+    "static": {
+      "dynamic.path1.$": "$.valid..path",
+      "dynamic.path2.$": "States.StringToJson($.someString)"
+    }
+  }
+}

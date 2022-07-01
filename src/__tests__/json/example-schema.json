@@ -1,0 +1,49 @@
+{
+  "$id": "https://asl-path-validator.cloud/example.json#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "Type": {
+      "type": "string",
+      "enum": ["Example"]
+    },
+    "OutputPath": {
+      "type": "string",
+      "format": "asl_path",
+      "nullable": true
+    },
+    "InputPath": {
+      "type": "string",
+      "format": "asl_path",
+      "nullable": true
+    },
+    "ResultPath": {
+      "type": "string",
+      "format": "asl_ref_path",
+      "nullable": true
+    },
+    "TimeoutSecondsPath": {
+      "type": "string",
+      "format": "asl_ref_path",
+      "nullable": true
+    },
+    "HeartbeatSecondsPath": {
+      "type": "string",
+      "format": "asl_ref_path",
+      "nullable": true
+    },
+    "ResultSelector": {
+      "type": "object",
+      "patternProperties": {
+        "^\\.+\\.\\$$": {"type":  "string",
+          "format": "asl_payload_template"
+        }
+      }
+    },
+    "Parameters": {
+      "$ref": "payload-template.json#"
+    }
+  },
+  "required": ["Type"],
+  "additionalProperties": false
+}
