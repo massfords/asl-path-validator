@@ -8,7 +8,7 @@
       "nullable": true,
       "format": "asl_payload_template"
     },
-    "^.+[^$]$": {
+    "^.+([^$]|[^.]\\$)$": {
       "oneOf": [
         {
           "type": "string",
@@ -20,5 +20,4 @@
       ]
     }
   }
-
 }
