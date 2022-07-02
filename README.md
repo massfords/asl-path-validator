@@ -34,9 +34,9 @@ $['store'][0]['book']
 
 ## validate a single expression
 ```typescript
-    expect(validatePath("$.library.movies", AslPathContext.REFERENCE_PATH)).toStrictEqual({
-      isValid: true,
-    });
+expect(validatePath("$.library.movies", AslPathContext.REFERENCE_PATH)).toStrictEqual({
+  isValid: true,
+});
 ```
 
 ## register validators as AJV formats
@@ -77,11 +77,11 @@ it("should accept valid input", () => {
 The spec references a [Java library](https://github.com/json-path/JsonPath) for the syntax of the expressions.  
 The documentation for the referenced library has more functionality than is supported by the AWS Step Function runtimes.
 
-| Expression Feature                                                     | Path               | Reference Path     | Payload Template   |
-|:-----------------------------------------------------------------------|:-------------------|:-------------------|:-------------------|
-| Simple dot notation or single predicate notation<br>`$.library.movies` | :white_check_mark: | :white_check_mark: | :white_check_mark: |     
-| Use of operators that select multiple nodes.<br>`.. @ , : ? *`         | :white_check_mark: | :x:                | :white_check_mark: |
-| Intrinsic functions<br>See below for the supported functions           | :x:                | :x:                | :white_check_mark: |
+| Expression Feature                                                                                | Path               | Reference Path     | Payload Template   |
+|:--------------------------------------------------------------------------------------------------|:-------------------|:-------------------|:-------------------|
+| Simple dot notation or single predicate notation<br>`$.library.movies`                            | :white_check_mark: | :white_check_mark: | :white_check_mark: |     
+| Use of operators that select multiple nodes via descent, wildcard, or a filter<br>`.. @ , : ? *`  | :white_check_mark: | :x:                | :white_check_mark: |
+| **Intrinsic functions**<br> `States.JsonToString($.foo)`<br>See below for the supported functions | :x:                | :x:                | :white_check_mark: |
 
 
 ### Context Expressions
