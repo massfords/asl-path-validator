@@ -3,11 +3,7 @@ import example from "./json/example-schema.json";
 import payloadTemplateSchema from "./json/payload-template.json";
 import fs from "fs";
 import path from "path";
-import {
-  registerPathValidator,
-  registerPayloadTemplate,
-  registerReferencePathValidator,
-} from "../ajv";
+import { registerAll } from "../ajv";
 import { must } from "../assertions";
 import { JSONPath } from "jsonpath-plus";
 
@@ -19,9 +15,7 @@ describe("tests for the ajv custom formatters", () => {
       schemas: [example, payloadTemplateSchema],
       allowUnionTypes: true,
     });
-    registerPathValidator(ajv, "asl_path");
-    registerReferencePathValidator(ajv, "asl_ref_path");
-    registerPayloadTemplate(ajv, "asl_payload_template");
+    registerAll(ajv);
   });
   const loadDefinition = (name: string): unknown => {
     return JSON.parse(
