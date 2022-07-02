@@ -1,7 +1,7 @@
 export enum AslPathContext {
-  PATH = "P",
-  REFERENCE_PATH = "RP",
-  PAYLOAD_TEMPLATE = "PT",
+  PATH = "path",
+  REFERENCE_PATH = "reference_path",
+  PAYLOAD_TEMPLATE = "payload_template",
 }
 
 export enum ErrorCodes {
