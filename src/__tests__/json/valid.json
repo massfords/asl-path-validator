@@ -12,7 +12,8 @@
   "Parameters": {
     "static$": {
       "dynamic.path1.$": "$.valid..path",
-      "dynamic.path2.$": "States.StringToJson($.someString)"
+      "dynamic.path2.$": "States.StringToJson($.someString)",
+      "dynamic.path3.$": "$.fooList[1:]"
     }
   }
 }

@@ -58,8 +58,9 @@ function_args
 subscriptable
    = STRING
    / start:NUMBER COLON end:NUMBER {return {start, end, slice:true}}
-   / NUMBER
+   / start:NUMBER COLON {return {start:start, end:null, slice: true}}
    / COLON end:NUMBER {return {start:null, end, slice: true}}
+   / NUMBER
    / WILDCARD_SUBSCRIPT
    / QUESTION PAREN_LEFT exp:expression PAREN_RIGHT {return {exp}}
    / jsonpath_

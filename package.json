@@ -1,10 +1,10 @@
 {
   "name": "asl-path-validator",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Validates the path expressions for the Amazon States Language",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "npx tsc && npm run test",
+    "build": "npm run generate && npx tsc && npm run test",
     "lint": "npx eslint . --max-warnings 0 --ext ts",
     "test": "npx jest",
     "generate": "mkdirp src/generated && ./node_modules/.bin/peggy -o src/generated/aslPaths.js src/aslPaths.pegjs",

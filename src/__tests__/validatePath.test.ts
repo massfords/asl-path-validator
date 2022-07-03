@@ -65,6 +65,7 @@ describe("unit tests for the parser", () => {
     "$.library.movies[0:2]",
     "$.library.movies[0,1,2,3]",
     "$..director",
+    "$.fooList[1:]",
   ];
   it.each(path_expressions)("%s valid path and payload template", (path) => {
     expect.hasAssertions();
