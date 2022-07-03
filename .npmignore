@@ -6,4 +6,4 @@ tmp
 __tests__
 .github
 *.test.js
-**/*.ts
+src/**/*.ts
