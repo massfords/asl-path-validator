@@ -92,6 +92,7 @@ describe("tests for the ajv custom formatters", () => {
     expect.hasAssertions();
     must(ajv);
     const { label, ...input } = inputWithLabel;
+    expect(label).toBeTruthy();
     const inputFields = Object.keys(input);
     expect(inputFields).toHaveLength(1);
     const result = ajv.validate(
