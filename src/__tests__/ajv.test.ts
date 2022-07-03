@@ -17,20 +17,37 @@ describe("tests for the ajv custom formatters", () => {
     });
     registerAll(ajv);
   });
-  const loadDefinition = (name: string): unknown => {
-    return JSON.parse(
+  const loadDefinition = (name: string): Record<string, unknown> => {
+    const parsed: Record<string, unknown> = JSON.parse(
       fs.readFileSync(path.join(__dirname, "json", name), "utf-8")
-    ) as unknown;
+    ) as Record<string, unknown>;
+    return parsed;
   };
 
-  it("should accept valid input", () => {
+  const valid_inputs: Record<string, unknown>[] = [
+    { ...loadDefinition("valid.json"), label: "valid file" },
+    {
+      label: "nested templates",
+      Type: "Example",
+      Parameters: {
+        flagged: true,
+        parts: {
+          "first.$": "$.vals[0]",
+          "last3.$": "$.vals[3:]",
+        },
+      },
+    },
+  ];
+
+  it.each(valid_inputs)("$label", (inputWithLabel) => {
     expect.hasAssertions();
-    const input = loadDefinition("valid.json");
     must(ajv);
+    const { label, ...input } = inputWithLabel;
     const result = ajv.validate(
       "https://asl-path-validator.cloud/example.json#",
       input
     );
+    expect(label).toBeTruthy();
     expect(ajv.errors ?? []).toStrictEqual([]);
     expect(result).toBe(true);
   });

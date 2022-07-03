@@ -32,14 +32,6 @@
       "format": "asl_ref_path",
       "nullable": true
     },
-    "ResultSelector": {
-      "type": "object",
-      "patternProperties": {
-        "^\\.+\\.\\$$": {"type":  "string",
-          "format": "asl_payload_template"
-        }
-      }
-    },
     "Parameters": {
       "$ref": "payload-template.json#"
     }
