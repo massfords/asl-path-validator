@@ -27,3 +27,5 @@ export const hasMultipleIndexValues = (ast: unknown): boolean => {
 export const hasNodeReference = (ast: unknown): boolean => {
   return find("$..*[?(@property === 'node' && @ === '@')]", ast as object);
 };
+
+export * from "./ajv";
