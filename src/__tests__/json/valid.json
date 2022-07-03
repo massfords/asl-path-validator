@@ -10,8 +10,16 @@
   "TimeoutSecondsPath": "$.valid.ref.path",
 
   "Parameters": {
-    "static$": {
-      "dynamic.path1.$": "$.valid..path",
+    "valid": {
+      "flagged": true,
+      "num": 5,
+      "null": null,
+      "dynamic.path1.$": "$.valid..path"
+    },
+    "valid$": {
+      "valid$": true,
+      "validNum$": 5,
+      "validNull$": null,
       "dynamic.path2.$": "States.StringToJson($.someString)",
       "dynamic.path3.$": "$.fooList[1:]"
     }

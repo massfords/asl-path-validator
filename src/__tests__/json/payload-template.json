@@ -8,11 +8,10 @@
       "nullable": true,
       "format": "asl_payload_template"
     },
-    "^.+([^$]|[^.]\\$)$": {
+    "^.+(([^.][^$])|([^.][$]))$": {
       "oneOf": [
         {
-          "type": "string",
-          "nullable": true
+          "type": ["number", "boolean", "string", "null"]
         },
         {
           "$ref": "#"

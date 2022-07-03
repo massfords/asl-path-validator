@@ -43,24 +43,26 @@ describe("tests for the ajv custom formatters", () => {
     HeartbeatSecondsPath?: string;
     ResultSelector?: unknown;
     Parameters?: unknown;
+    label: string;
   }> = [
     {
       OutputPath: "not a valid path",
+      label: "invalid json path",
     },
     {
       OutputPath: "States.StringToJson('functions not allowed here')",
-    },
-    {
-      ResultPath: "States.StringToJson('functions not allowed here')",
+      label: "intrinsic function out of place",
     },
     {
       ResultPath: "$.invalid..path",
+      label: "recursive descent not allowed in ref path",
     },
     {
       Parameters: {
         "dynamic.path1.$": "not a valid path",
         static2: "ok",
       },
+      label: "field matching path pattern doesn't have a valud path",
     },
     {
       Parameters: {
@@ -71,22 +73,25 @@ describe("tests for the ajv custom formatters", () => {
           },
         },
       },
+      label: "deeply nested invalid payload template field",
     },
     {
       Parameters: {
         deeply_nested: {
-          static$: {
-            "nested.dynamic.path1.$": "not a valid path",
-            static2$: "ok",
+          valid$: {
+            "invalid.$": "not a valid path",
+            valid2$: "ok",
           },
         },
       },
+      label: "deeply nested invalid with dollar",
     },
   ];
 
-  it.each(invalid_shapes)("%s should be rejected", (input) => {
+  it.each(invalid_shapes)("$label should be rejected", (inputWithLabel) => {
     expect.hasAssertions();
     must(ajv);
+    const { label, ...input } = inputWithLabel;
     const inputFields = Object.keys(input);
     expect(inputFields).toHaveLength(1);
     const result = ajv.validate(
