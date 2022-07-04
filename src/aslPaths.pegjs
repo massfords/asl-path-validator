@@ -62,7 +62,7 @@ subscriptable
    / COLON end:NUMBER {return {start:null, end, slice: true}}
    / NUMBER
    / WILDCARD_SUBSCRIPT
-   / QUESTION PAREN_LEFT exp:expression PAREN_RIGHT {return {exp}}
+   / QUESTION? PAREN_LEFT exp:expression PAREN_RIGHT {return {exp}}
    / jsonpath_
 
 expression
