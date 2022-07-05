@@ -1,87 +1,155 @@
-import { AslPathContext, ErrorCodes } from "../types";
+import { AslPathContext } from "../types";
 import { validatePath } from "../index";
+import { must } from "../assertions";
 
 describe("unit tests for the parser", () => {
-  const asl_spec_reference_paths = [
-    "$.store.book",
-    "$.store\\.book",
-    "$.\\stor\\e.boo\\k",
-    "$.store.book.title",
-    "$.foo.\\.bar",
-    "$.foo\\@bar.baz\\[\\[.\\?pretty",
-    "$.&Ж中.\uD800\uDF46",
-    "$.ledgers.branch[0].pending.count",
-    "$.ledgers.branch[0]",
-    "$.ledgers[0][22][315].foo",
-    "$['store']['book']",
-    "$['store'][0]['book']",
+  const All = [
+    AslPathContext.REFERENCE_PATH,
+    AslPathContext.PATH,
+    AslPathContext.PAYLOAD_TEMPLATE,
   ];
+  const NoRefPaths = [AslPathContext.PATH, AslPathContext.PAYLOAD_TEMPLATE];
+  const PayloadTemplatesOnly = [AslPathContext.PAYLOAD_TEMPLATE];
+  const None: Array<AslPathContext> = [];
 
-  it.each(asl_spec_reference_paths)("%s", (path) => {
-    expect.hasAssertions();
-    expect(validatePath(path, AslPathContext.REFERENCE_PATH)).toStrictEqual({
-      isValid: true,
-    });
-    expect(validatePath(path, AslPathContext.PATH)).toStrictEqual({
-      isValid: true,
-    });
-    expect(validatePath(path, AslPathContext.PAYLOAD_TEMPLATE)).toStrictEqual({
-      isValid: true,
-    });
+  interface TestInput {
+    path: string;
+    valid_in: Array<AslPathContext>;
+  }
+
+  const paths: TestInput[] = [
+    // reference path examples from the ASL spec
+    { path: "$.store.book", valid_in: All },
+    { path: "$.store\\.book", valid_in: All },
+    { path: "$.\\stor\\e.boo\\k", valid_in: All },
+    { path: "$.store.book.title", valid_in: All },
+    { path: "$.foo.\\.bar", valid_in: All },
+    { path: "$.foo\\@bar.baz\\[\\[.\\?pretty", valid_in: All },
+    { path: "$.&Ж中.\uD800\uDF46", valid_in: All },
+    { path: "$.ledgers.branch[0].pending.count", valid_in: All },
+    { path: "$.ledgers.branch[0]", valid_in: All },
+    { path: "$.ledgers[0][22][315].foo", valid_in: All },
+    { path: "$['store']['book']", valid_in: All },
+    { path: "$['store'][0]['book']", valid_in: All },
+    // intrinsic functions
+    {
+      path: "States.Format('Welcome to {} {}\\'s playlist.', $.firstName, $.lastName)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Format('Today is {}', $$.DayOfWeek)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.StringToJson($.someString)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    { path: "States.JsonToString($.someJson)", valid_in: PayloadTemplatesOnly },
+    {
+      path: "States.Array('Foo', 2020, $.someJson, null)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Format('{}_{}',$$.Execution.Name,$['test-batch']['batch_id'])",
+      valid_in: PayloadTemplatesOnly,
+    },
+
+    // assorted paths
+    {
+      path: "$[(@.length-1)].bar",
+      valid_in: NoRefPaths,
+    },
+    { path: "$.library.movies[?(@.genre)]", valid_in: NoRefPaths },
+    {
+      path: "$.library.movies[?(@.year == 1992)]",
+      valid_in: NoRefPaths,
+    },
+    {
+      path: "$.library.movies[?(@.year >= 1992)]",
+      valid_in: NoRefPaths,
+    },
+    { path: "$.library.movies[0:2]", valid_in: NoRefPaths },
+    { path: "$.library.movies[0,1,2,3]", valid_in: NoRefPaths },
+    { path: "$..director", valid_in: NoRefPaths },
+    { path: "$.fooList[1:]", valid_in: NoRefPaths },
+
+    // examples from https://github.com/json-path/JsonPath
+    // a few small changes were added to have better coverage.
+    // i.e. changed a few expressions starting with a recursive
+    // descent to simple subscript $..book
+    { path: "$.store.book[*].author", valid_in: NoRefPaths },
+    { path: "$..author", valid_in: NoRefPaths },
+    { path: "$.store.*", valid_in: NoRefPaths },
+    { path: "$.store..price", valid_in: NoRefPaths },
+    { path: "$.book[2]", valid_in: NoRefPaths },
+    { path: "$..book[2]", valid_in: NoRefPaths },
+    { path: "$.book[-2]", valid_in: None },
+    { path: "$.book[0,1]", valid_in: NoRefPaths },
+    { path: "$.book[:2]", valid_in: NoRefPaths },
+    { path: "$.book[1:2]", valid_in: NoRefPaths },
+    { path: "$.book[-2:]", valid_in: None },
+    { path: "$.book[2:]", valid_in: NoRefPaths },
+    { path: "$.book[?(@.isbn)]", valid_in: NoRefPaths },
+    { path: "$.store.book[?(@.price < 10)]", valid_in: NoRefPaths },
+    { path: "$.book[?(@.price <= $['expensive'])]", valid_in: None },
+    { path: "$.book[?(@.author =~ /.*REES/i)]", valid_in: None },
+    { path: "$..*", valid_in: NoRefPaths },
+    { path: "..book.length()", valid_in: None },
+  ];
+  interface TestInputForContext {
+    path: string;
+    context: AslPathContext | null;
+  }
+  const toInput = (isValid: boolean): TestInputForContext[] => {
+    return paths
+      .filter((input) =>
+        isValid ? input.valid_in.length > 0 : input.valid_in.length === 0
+      )
+      .map((input) => {
+        if (input.valid_in.length === 0) {
+          const val: TestInputForContext[] = [
+            {
+              path: input.path,
+              context: null,
+            },
+          ];
+          return val;
+        }
+        return input.valid_in.map((context) => {
+          const val: TestInputForContext = {
+            path: input.path,
+            context,
+          };
+          return val;
+        });
+      })
+      .reduce((previous, current) => [...previous, ...current]);
+  };
+  describe("valid paths", () => {
+    it.each(toInput(true))(
+      "$path is valid as $context",
+      ({ path, context }) => {
+        expect.hasAssertions();
+        must(context);
+        const result = validatePath(path, context);
+        if (!result.isValid) {
+          // gets a better error message
+          expect(result.message).toBeFalsy();
+        }
+        expect(result.isValid).toBe(true);
+      }
+    );
   });
 
-  const intrinsic_functions = [
-    "States.Format('Welcome to {} {}\\'s playlist.', $.firstName, $.lastName)",
-    "States.Format('Today is {}', $$.DayOfWeek)",
-    "States.StringToJson($.someString)",
-    "States.JsonToString($.someJson)",
-    "States.Array('Foo', 2020, $.someJson, null)",
-  ];
-  it.each(intrinsic_functions)("%s", (path) => {
-    expect.hasAssertions();
-    expect(validatePath(path, AslPathContext.PAYLOAD_TEMPLATE)).toStrictEqual({
-      isValid: true,
-    });
-  });
-  it.each(intrinsic_functions)(
-    "%s invalid outside of Payload Template",
-    (path) => {
+  describe("invalid paths", () => {
+    it.each(toInput(false))("$path is not valid as $context", ({ path }) => {
       expect.hasAssertions();
-      expect(validatePath(path, AslPathContext.PATH)).toStrictEqual({
-        isValid: false,
-        code: ErrorCodes.exp_has_functions,
-      });
-      expect(validatePath(path, AslPathContext.REFERENCE_PATH)).toStrictEqual({
-        isValid: false,
-        code: ErrorCodes.exp_has_functions,
-      });
-    }
-  );
-
-  const path_expressions = [
-    "$.library.movies[?(@.genre)]",
-    "$.library.movies[?(@.year == 1992)]",
-    "$.library.movies[?(@.year >= 1992)]",
-    "$.library.movies[0:2]",
-    "$.library.movies[0,1,2,3]",
-    "$..director",
-    "$.fooList[1:]",
-    "$[(@.length-1)].bar",
-  ];
-  it.each(path_expressions)("%s valid path and payload template", (path) => {
-    expect.hasAssertions();
-    expect(validatePath(path, AslPathContext.PATH)).toStrictEqual({
-      isValid: true,
-    });
-    expect(validatePath(path, AslPathContext.PAYLOAD_TEMPLATE)).toStrictEqual({
-      isValid: true,
-    });
-  });
-  it.each(path_expressions)("%s invalid as Reference Path", (path) => {
-    expect.hasAssertions();
-    expect(validatePath(path, AslPathContext.REFERENCE_PATH)).toStrictEqual({
-      isValid: false,
-      code: ErrorCodes.exp_has_non_reference_path_ops,
+      // use the most permissive of the contexts to try to parse it
+      // all the contexts use the same parser. There's some additional
+      // limitations enforced by the Reference Path and Path values but
+      // the Payload Template is the least restricted.
+      const result = validatePath(path, AslPathContext.PAYLOAD_TEMPLATE);
+      expect(result.isValid).toBe(false);
     });
   });
 });
