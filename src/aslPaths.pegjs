@@ -20,11 +20,11 @@ subscript
    / brackets:subscriptables sub:subscript? {return {axis: ".", brackets, sub}}
 
 subscriptables
-   = BRACKET_LEFT head:subscriptable BRACKET_RIGHT { return {head}}
-   / BRACKET_LEFT head:NUMBER tail:( COMMA NUMBER )* BRACKET_RIGHT {
+   = BRACKET_LEFT _ head:subscriptable _ BRACKET_RIGHT { return {head}}
+   / BRACKET_LEFT _ head:NUMBER _ tail:( COMMA _ NUMBER )* _ BRACKET_RIGHT {
    		return {
         head,
-        tail: tail.map((t) => t[1])
+        tail: tail.map((t) => t[2])
         }
      }
 
@@ -49,7 +49,7 @@ single_arg
 
 function_args
    = PAREN_LEFT _ PAREN_RIGHT { return []}
-   / PAREN_LEFT _ head:jsonpath__ _ tail:(COMMA _ jsonpath__ _)* _ PAREN_RIGHT
+   / PAREN_LEFT _ head:jsonpath__ _ tail:(COMMA _ jsonpath__)* _ PAREN_RIGHT
    {return {
    	head,
     tail: tail.map((t) => t[2]) }
@@ -62,19 +62,21 @@ subscriptable
    / COLON end:NUMBER {return {start:null, end, slice: true}}
    / NUMBER
    / WILDCARD_SUBSCRIPT
-   / QUESTION? PAREN_LEFT exp:expression PAREN_RIGHT {return {exp}}
+   / QUESTION PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp}}
+   / PAREN_LEFT _ CURRENT_VALUE ".length" _ MINUS _ offset:NUMBER _ PAREN_RIGHT {return {node:"@", offset: -offset}}
    / jsonpath_
 
 expression
    = expression_
 
 expression_
-   = PAREN_LEFT exp:expression PAREN_RIGHT {return {exp}}
+   = PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp}}
+   / path:jsonpath__ _ op:comparison_op _ val:NUMBER {return {path, op, val}}
+   /*/ path:jsonpath__ _ op:comparison_op _ val:jsonpath__ {return {path, op, val}}*/
    / path:jsonpath__
-   / path:jsonpath__ op:comparison_op val:NUMBER {return {path, op, val}}
 
 comparison_op
-	= EQ / LT / LE / GT / GE
+	= EQ / LE / LT / GE / GT
 
 value
    = STRING
@@ -82,7 +84,6 @@ value
    / TRUE
    / FALSE
    / NULL
-
 
 CURRENT_VALUE = "@"
 RECURSIVE_DESCENT = ".."
@@ -97,6 +98,7 @@ GT = ">"
 LE = "<="
 LT = "<"
 
+MINUS = "-"
 BRACKET_LEFT = "["
 BRACKET_RIGHT = "]"
 COMMA = ","
@@ -111,7 +113,7 @@ FALSE = "false"
 NULL = "null"
 
 ID
-   = v:(escaped / [^),'"\\\.\[\]])* {return v.join('')}
+   = v:(escaped / [^),'"\\\.\[\] ><!=])* {return v.join('')}
 STRING = singlequoted / doublequoted
 
 singlequoted = [\'] v:(escaped / [^'\\])* [\'] {return v.join("")}
