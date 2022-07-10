@@ -112,10 +112,9 @@ Note that the comparison operators only work with numeric values in the **AWS Da
 
 The table below includes all the fields within a Step Function that are validated.
 
-The suggested approach is to update the asl-validator schemas to uses AJV format strings
-for these fields.
+> See [asl-validator](https://github.com/ChristopheBougere/asl-validator) 3.x branch or higher for schemas modeling ASL.  
 
-The example schema provided here also includes a recursive definition for the **Payload Template** context
+The schema provided here illustrate how to integrate and includes a recursive definition for the **Payload Template** context.
 
 | Step Function Field            | Expression Type  |
 |--------------------------------|------------------|
