@@ -80,7 +80,7 @@ expression
 
 expression_
    = PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp}}
-   / path:jsonpath__ _ op:comparison_op _ val:NUMBER {return {path, op, val}}
+   / path:jsonpath__ _ op:comparison_op _ minus:MINUS? val:NUMBER {return {path, op, val: minus==='-'?-val:val}}
    / path:jsonpath__
 
 comparison_op
@@ -130,5 +130,4 @@ escaped = "\\" c:allchars { return c; }
 allchars = $[^\\n]
 
 _ "whitespace" = [ \t\n]*
-
 

@@ -92,6 +92,7 @@ describe("unit tests for the parser", () => {
     { path: "$.book[2:]", valid_in: NoRefPaths },
     { path: "$.book[?(@.isbn)]", valid_in: NoRefPaths },
     { path: "$.store.book[?(@.price < 10)]", valid_in: NoRefPaths },
+    { path: "$.store.book[?(@.price < -10)]", valid_in: NoRefPaths },
     { path: "$.book[?(@.price <= $['expensive'])]", valid_in: None },
     { path: "$.book[?(@.author =~ /.*REES/i)]", valid_in: None },
     { path: "$..*", valid_in: NoRefPaths },
