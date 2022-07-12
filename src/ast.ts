@@ -8,22 +8,13 @@ const find = (path: string, ast: unknown): boolean => {
   return results.length > 0;
 };
 
+export const referencePathChecks = (ast: unknown): boolean => {
+  return !find(
+    "$..[atmark,wildcard,negOffset,slice,recursiveDescent,multipleIndex,filter]",
+    ast
+  );
+};
+
 export const hasFunctions = (ast: unknown): boolean => {
-  return find("$..func", ast);
-};
-
-export const hasDescentOperator = (ast: unknown): boolean => {
-  return find("$..*[?(@property === 'axis' && @ === '..')]", ast);
-};
-
-export const hasSliceOperator = (ast: unknown): boolean => {
-  return find("$..slice", ast);
-};
-
-export const hasMultipleIndexValues = (ast: unknown): boolean => {
-  return find("$..brackets.tail", ast);
-};
-
-export const hasNodeReference = (ast: unknown): boolean => {
-  return find("$..*[?(@property === 'node' && @ === '@')]", ast as object);
+  return find("$..[func]", ast);
 };
