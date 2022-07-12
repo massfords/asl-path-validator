@@ -2,13 +2,7 @@
 // @ts-ignore
 import { parse } from "./generated/aslPaths";
 import { AslPathContext, ErrorCodes, ValidationResult } from "./types";
-import {
-  hasDescentOperator,
-  hasFunctions,
-  hasMultipleIndexValues,
-  hasNodeReference,
-  hasSliceOperator,
-} from "./ast";
+import { hasFunctions, referencePathChecks } from "./ast";
 
 export const validatePath = (
   path: string,
@@ -49,12 +43,7 @@ export const validatePath = (
           code: ErrorCodes.exp_has_functions,
         };
       }
-      if (
-        hasDescentOperator(ast) ||
-        hasSliceOperator(ast) ||
-        hasMultipleIndexValues(ast) ||
-        hasNodeReference(ast)
-      ) {
+      if (!referencePathChecks(ast)) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_non_reference_path_ops,

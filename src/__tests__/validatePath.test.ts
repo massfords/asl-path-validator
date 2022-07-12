@@ -70,6 +70,7 @@ describe("unit tests for the parser", () => {
     },
     { path: "$.library.movies[0:2]", valid_in: NoRefPaths },
     { path: "$.library.movies[0,1,2,3]", valid_in: NoRefPaths },
+    { path: "$.library.movies[0,1,-2]", valid_in: NoRefPaths },
     { path: "$..director", valid_in: NoRefPaths },
     { path: "$.fooList[1:]", valid_in: NoRefPaths },
 
@@ -81,13 +82,13 @@ describe("unit tests for the parser", () => {
     { path: "$..author", valid_in: NoRefPaths },
     { path: "$.store.*", valid_in: NoRefPaths },
     { path: "$.store..price", valid_in: NoRefPaths },
-    { path: "$.book[2]", valid_in: NoRefPaths },
+    { path: "$.book[2]", valid_in: All },
     { path: "$..book[2]", valid_in: NoRefPaths },
-    { path: "$.book[-2]", valid_in: None },
+    { path: "$.book[-2]", valid_in: NoRefPaths },
     { path: "$.book[0,1]", valid_in: NoRefPaths },
     { path: "$.book[:2]", valid_in: NoRefPaths },
     { path: "$.book[1:2]", valid_in: NoRefPaths },
-    { path: "$.book[-2:]", valid_in: None },
+    { path: "$.book[-2:]", valid_in: NoRefPaths },
     { path: "$.book[2:]", valid_in: NoRefPaths },
     { path: "$.book[?(@.isbn)]", valid_in: NoRefPaths },
     { path: "$.store.book[?(@.price < 10)]", valid_in: NoRefPaths },
@@ -98,58 +99,37 @@ describe("unit tests for the parser", () => {
   ];
   interface TestInputForContext {
     path: string;
-    context: AslPathContext | null;
+    context: AslPathContext;
+    expected_outcome: boolean;
   }
-  const toInput = (isValid: boolean): TestInputForContext[] => {
+  const toInput = (): TestInputForContext[] => {
     return paths
-      .filter((input) =>
-        isValid ? input.valid_in.length > 0 : input.valid_in.length === 0
-      )
       .map((input) => {
-        if (input.valid_in.length === 0) {
-          const val: TestInputForContext[] = [
-            {
-              path: input.path,
-              context: null,
-            },
-          ];
-          return val;
-        }
-        return input.valid_in.map((context) => {
-          const val: TestInputForContext = {
+        const expansions: TestInputForContext[] = [];
+        All.forEach((context) => {
+          expansions.push({
             path: input.path,
             context,
-          };
-          return val;
+            expected_outcome: input.valid_in.indexOf(context) !== -1,
+          });
         });
+        return expansions;
       })
       .reduce((previous, current) => [...previous, ...current]);
   };
   describe("valid paths", () => {
-    it.each(toInput(true))(
-      "$path is valid as $context",
-      ({ path, context }) => {
+    it.each(toInput())(
+      "$path as $context expected: $expected_outcome",
+      ({ path, context, expected_outcome }) => {
         expect.hasAssertions();
         must(context);
         const result = validatePath(path, context);
-        if (!result.isValid) {
+        if (!result.isValid && expected_outcome) {
           // gets a better error message
           expect(result.message).toBeFalsy();
         }
-        expect(result.isValid).toBe(true);
+        expect(result.isValid).toBe(expected_outcome);
       }
     );
-  });
-
-  describe("invalid paths", () => {
-    it.each(toInput(false))("$path is not valid as $context", ({ path }) => {
-      expect.hasAssertions();
-      // use the most permissive of the contexts to try to parse it
-      // all the contexts use the same parser. There's some additional
-      // limitations enforced by the Reference Path and Path values but
-      // the Payload Template is the least restricted.
-      const result = validatePath(path, AslPathContext.PAYLOAD_TEMPLATE);
-      expect(result.isValid).toBe(false);
-    });
   });
 });

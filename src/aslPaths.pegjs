@@ -6,7 +6,7 @@ jsonpath
 jsonpath_
    = CONTEXT_ROOT_VALUE sub:subscript? {return {node: "$$", sub}}
    / ROOT_VALUE sub:subscript? {return {node: "$", sub}}
-   / CURRENT_VALUE sub:subscript? {return {node: "@", sub}}
+   / CURRENT_VALUE sub:subscript? {return {node: "@", sub, atmark: true}}
    / intrinsic_function
 
 jsonpath__
@@ -14,18 +14,28 @@ jsonpath__
    / value
 
 subscript
-   = RECURSIVE_DESCENT id:subscriptableBareword sub:subscript? {return {axis: "..", id, sub}}
-   / RECURSIVE_DESCENT brackets:subscriptables sub:subscript? {return {axis: "..", brackets, sub}}
+   = RECURSIVE_DESCENT id:subscriptableBareword sub:subscript? {return {axis: "..", id, sub, recursiveDescent: true}}
+   / RECURSIVE_DESCENT brackets:subscriptables sub:subscript? {return {axis: "..", brackets, sub, recursiveDescent: true}}
+   / SUBSCRIPT WILDCARD_SUBSCRIPT sub:subscript? {return {axis: ".", wildcard: true, sub}}
    / SUBSCRIPT id:subscriptableBareword sub:subscript? {return {axis: ".", id, sub}}
    / brackets:subscriptables sub:subscript? {return {axis: ".", brackets, sub}}
 
 subscriptables
    = BRACKET_LEFT _ head:subscriptable _ BRACKET_RIGHT { return {head}}
-   / BRACKET_LEFT _ head:NUMBER _ tail:( COMMA _ NUMBER )* _ BRACKET_RIGHT {
-   		return {
-        head,
-        tail: tail.map((t) => t[2])
+   / BRACKET_LEFT _ WILDCARD_SUBSCRIPT _ BRACKET_RIGHT { return {wildcard: true}}
+   / BRACKET_LEFT _ minus:MINUS? head:NUMBER _ tail:( COMMA _ MINUS? NUMBER )* _ BRACKET_RIGHT {
+        const negOffset = (minus === '-') || tail.some((t) => t[2]);
+        const result = {
+            head: minus === '-'? -head : head
+        };
+        if (tail.length >0 ) {
+        	result.tail = tail.map((t) => t[2] === '-'? -t[3] : t[3]);
+            result.multipleIndex = true;
         }
+        if (negOffset) {
+        	result.negOffset = true;
+        }
+        return result;
      }
 
 subscriptableBareword
@@ -57,13 +67,12 @@ function_args
 
 subscriptable
    = STRING
-   / start:NUMBER COLON end:NUMBER {return {start, end, slice:true}}
-   / start:NUMBER COLON {return {start:start, end:null, slice: true}}
-   / COLON end:NUMBER {return {start:null, end, slice: true}}
+   / MINUS? start:NUMBER COLON MINUS? end:NUMBER {return {start, end, slice:true}}
+   / MINUS? start:NUMBER COLON {return {start:start, end:null, slice: true}}
+   / COLON MINUS? end:NUMBER {return {start:null, end, slice: true}}
    / NUMBER
-   / WILDCARD_SUBSCRIPT
-   / QUESTION PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp}}
-   / PAREN_LEFT _ CURRENT_VALUE ".length" _ MINUS _ offset:NUMBER _ PAREN_RIGHT {return {node:"@", offset: -offset}}
+   / QUESTION PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp, filter: true}}
+   / PAREN_LEFT _ CURRENT_VALUE ".length" _ MINUS _ offset:NUMBER _ PAREN_RIGHT {return {node:"@", offset: -offset, atmark: true}}
    / jsonpath_
 
 expression
@@ -72,7 +81,6 @@ expression
 expression_
    = PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp}}
    / path:jsonpath__ _ op:comparison_op _ val:NUMBER {return {path, op, val}}
-   /*/ path:jsonpath__ _ op:comparison_op _ val:jsonpath__ {return {path, op, val}}*/
    / path:jsonpath__
 
 comparison_op
@@ -122,4 +130,5 @@ escaped = "\\" c:allchars { return c; }
 allchars = $[^\\n]
 
 _ "whitespace" = [ \t\n]*
+
 
