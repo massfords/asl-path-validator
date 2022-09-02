@@ -44,10 +44,31 @@ subscriptableBareword
    / WILDCARD_SUBSCRIPT
 
 intrinsic_function
-	= func:"States.Format" args:function_args {return {func, args}}
+    = func:"States.Array" args:function_args {return {func, args}}
+    / func:"States.ArrayPartition" args:function_args {return {func, args}}
+    / func:"States.ArrayContains" args:function_args {return {func, args}}
+    / func:"States.ArrayRange" args:function_args {return {func, args}}
+    / func:"States.ArrayGetItem" args:function_args {return {func, args}}
+    / func:"States.ArrayLength" args:single_arg {return {func, args}}
+    / func:"States.ArrayUnique" args:single_arg {return {func, args}}
+    / func:"States.Base64Encode" args:single_arg {return {func, args}}
+    / func:"States.Base64Decode" args:single_arg {return {func, args}}
+    / func:"States.Hash" args:function_args {return {func, args}}
+    / func:"States.JsonMerge" args:function_args {return {func, args}}
     / func:"States.StringToJson" args:single_arg {return {func, args}}
     / func:"States.JsonToString" args:single_arg {return {func, args}}
-    / func:"States.Array" args:function_args {return {func, args}}
+    / func:"States.MathRandom" args:function_args {return {func, args}}
+    / func:"States.MathAdd" args:function_args {return {func, args}}
+    / func:"States.StringSplit" args:function_args {return {func, args}}
+    / func:"States.UUID" args:no_args {return {func, args}}
+	/ func:"States.Format" args:function_args {return {func, args}}
+
+no_args
+   = PAREN_LEFT _ PAREN_RIGHT
+   {return {
+   	head: null,
+    tail: [] }
+   }
 
 single_arg
    = PAREN_LEFT _ head:jsonpath__ _ PAREN_RIGHT
@@ -130,4 +151,3 @@ escaped = "\\" c:allchars { return c; }
 allchars = $[^\\n]
 
 _ "whitespace" = [ \t\n]*
-
