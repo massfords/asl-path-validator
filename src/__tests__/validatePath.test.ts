@@ -53,6 +53,63 @@ describe("unit tests for the parser", () => {
       path: "States.Format('{}_{}',$$.Execution.Name,$['test-batch']['batch_id'])",
       valid_in: PayloadTemplatesOnly,
     },
+    // new functions from 2022-08
+    {
+      path: "States.ArrayPartition($.inputArray,4)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.ArrayContains($.inputArray, $.lookingFor)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.ArrayRange(1, 9, 2)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.ArrayGetItem($.inputArray, $.index)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.ArrayLength($.inputArray)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.ArrayUnique($.inputArray)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Base64Encode($.input)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Base64Decode($.base64)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Hash($.Data, $.Algorithm)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.JsonMerge($.json1, $.json2, false)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathRandom($.start, $.end)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd($.value1, $.step)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.StringSplit($.inputString, $.splitter)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.UUID()",
+      valid_in: PayloadTemplatesOnly,
+    },
 
     // assorted paths
     {
