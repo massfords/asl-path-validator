@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import type Ajv from "ajv";
 import { validatePath } from "./index";
 import { AslPathContext } from "./types";
 
