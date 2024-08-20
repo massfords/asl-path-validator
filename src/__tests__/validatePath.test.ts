@@ -71,6 +71,10 @@ describe("unit tests for the parser", () => {
       valid_in: PayloadTemplatesOnly,
     },
     {
+      path: "States.ArrayGetItem($.DescribeRecord.RecordOutputs[?(@.OutputKey == FooBar)].OutputValue, 0)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
       path: "States.ArrayLength($.inputArray)",
       valid_in: PayloadTemplatesOnly,
     },
