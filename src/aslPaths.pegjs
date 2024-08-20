@@ -92,9 +92,14 @@ subscriptable
    / MINUS? start:NUMBER COLON {return {start:start, end:null, slice: true}}
    / COLON MINUS? end:NUMBER {return {start:null, end, slice: true}}
    / NUMBER
-   / QUESTION PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp, filter: true}}
+   / QUESTION PAREN_LEFT _ exp:predicate _ PAREN_RIGHT {return {exp, filter: true}}
    / PAREN_LEFT _ CURRENT_VALUE ".length" _ MINUS _ offset:NUMBER _ PAREN_RIGHT {return {node:"@", offset: -offset, atmark: true}}
    / jsonpath_
+
+predicate
+    = CURRENT_VALUE SUBSCRIPT ID _ op:comparison_op _ ID {return {node: "@", atmark: true}}
+    / CURRENT_VALUE SUBSCRIPT ID _ op:comparison_op _ value {return {node: "@", atmark: true}}
+    / expression_
 
 expression
    = expression_
