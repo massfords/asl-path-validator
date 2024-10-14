@@ -1,6 +1,6 @@
 {
   "name": "asl-path-validator",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "Validates the path expressions for the Amazon States Language",
   "main": "./dist/index.js",
   "scripts": {
