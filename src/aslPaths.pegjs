@@ -1,10 +1,12 @@
 jsonpath
    = CONTEXT_ROOT_VALUE sub:subscript? _  {return {node: "$$", sub, isRoot:true}}
+   / variable
    / ROOT_VALUE sub:subscript? _  {return {node: "$", sub, isRoot:true}}
    / intrinsic_function
 
 jsonpath_
    = CONTEXT_ROOT_VALUE sub:subscript? {return {node: "$$", sub}}
+   / variable
    / ROOT_VALUE sub:subscript? {return {node: "$", sub}}
    / CURRENT_VALUE sub:subscript? {return {node: "@", sub, atmark: true}}
    / intrinsic_function
@@ -12,6 +14,9 @@ jsonpath_
 jsonpath__
    = jsonpath_
    / value
+
+variable
+    = ROOT_VALUE v:ID sub:subscript? {return {node: "$", sub, var: v}}
 
 subscript
    = RECURSIVE_DESCENT id:subscriptableBareword sub:subscript? {return {axis: "..", id, sub, recursiveDescent: true}}
@@ -147,7 +152,7 @@ FALSE = "false"
 NULL = "null"
 
 ID
-   = v:(escaped / [^),'"\\\.\[\] ><!=])* {return v.join('')}
+   = v:(escaped / [^),'"\\\.\[\] ><!=])+ {return v.join('')}
 STRING = singlequoted / doublequoted
 
 singlequoted = [\'] v:(escaped / [^'\\])* [\'] {return v.join("")}

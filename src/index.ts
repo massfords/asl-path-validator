@@ -2,7 +2,7 @@
 // @ts-ignore
 import { parse } from "./generated/aslPaths";
 import { AslPathContext, ErrorCodes, ValidationResult } from "./types";
-import { hasFunctions, referencePathChecks } from "./ast";
+import { hasFunctions, hasVariable, referencePathChecks } from "./ast";
 
 export const validatePath = (
   path: string,
@@ -37,6 +37,7 @@ export const validatePath = (
       }
       break;
     case AslPathContext.REFERENCE_PATH:
+    case AslPathContext.RESULT_PATH:
       if (hasFunctions(ast)) {
         return {
           isValid: false,
@@ -48,6 +49,14 @@ export const validatePath = (
           isValid: false,
           code: ErrorCodes.exp_has_non_reference_path_ops,
         };
+      }
+      if (context === AslPathContext.RESULT_PATH) {
+        if (hasVariable(ast)) {
+          return {
+            isValid: false,
+            code: ErrorCodes.exp_has_variable,
+          };
+        }
       }
       break;
     default: {

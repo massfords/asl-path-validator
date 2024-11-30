@@ -18,3 +18,7 @@ export const referencePathChecks = (ast: unknown): boolean => {
 export const hasFunctions = (ast: unknown): boolean => {
   return find("$..[func]", ast);
 };
+
+export const hasVariable = (ast: unknown): boolean => {
+  return find("$..[var]", ast);
+};
