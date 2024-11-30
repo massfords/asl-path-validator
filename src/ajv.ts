@@ -7,6 +7,7 @@ export const AslPathValidatorConfig = {
     [AslPathContext.PATH]: "asl_path",
     [AslPathContext.REFERENCE_PATH]: "asl_ref_path",
     [AslPathContext.PAYLOAD_TEMPLATE]: "asl_payload_template",
+    [AslPathContext.RESULT_PATH]: "asl_result_path",
   },
   silent: true,
 };
@@ -43,6 +44,13 @@ export const registerAll = (
     config.format_names[AslPathContext.PAYLOAD_TEMPLATE],
     (path: string): boolean => {
       return validateAdapter(path, AslPathContext.PAYLOAD_TEMPLATE);
+    }
+  );
+
+  ajv.addFormat(
+    config.format_names[AslPathContext.RESULT_PATH],
+    (path: string): boolean => {
+      return validateAdapter(path, AslPathContext.RESULT_PATH);
     }
   );
 };

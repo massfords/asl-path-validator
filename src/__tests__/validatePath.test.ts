@@ -7,8 +7,14 @@ describe("unit tests for the parser", () => {
     AslPathContext.REFERENCE_PATH,
     AslPathContext.PATH,
     AslPathContext.PAYLOAD_TEMPLATE,
+    AslPathContext.RESULT_PATH,
   ];
   const NoRefPaths = [AslPathContext.PATH, AslPathContext.PAYLOAD_TEMPLATE];
+  const NoResultPath = [
+    AslPathContext.PATH,
+    AslPathContext.PAYLOAD_TEMPLATE,
+    AslPathContext.REFERENCE_PATH,
+  ];
   const PayloadTemplatesOnly = [AslPathContext.PAYLOAD_TEMPLATE];
   const None: Array<AslPathContext> = [];
 
@@ -31,6 +37,10 @@ describe("unit tests for the parser", () => {
     { path: "$.ledgers[0][22][315].foo", valid_in: All },
     { path: "$['store']['book']", valid_in: All },
     { path: "$['store'][0]['book']", valid_in: All },
+    { path: "$variable", valid_in: NoResultPath },
+    { path: "$variable.foo.bar", valid_in: NoResultPath },
+    { path: "$variable[0]", valid_in: NoResultPath },
+    { path: "$variable.foo[1].bar", valid_in: NoResultPath },
     // intrinsic functions
     {
       path: "States.Format('Welcome to {} {}\\'s playlist.', $.firstName, $.lastName)",
@@ -38,6 +48,22 @@ describe("unit tests for the parser", () => {
     },
     {
       path: "States.Format('Today is {}', $$.DayOfWeek)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Format('Hello {}, your application has been approved.', $inputPayload)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Format('Hello {}, your application has been approved.', $inputPayload.foo.bar)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Format('Hello {}, your application has been approved.', $inputPayload[0])",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.Format('Hello {}, your application has been approved.', $inputPayload.foo[1].bar)",
       valid_in: PayloadTemplatesOnly,
     },
     {
