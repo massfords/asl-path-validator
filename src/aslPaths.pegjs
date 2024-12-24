@@ -122,7 +122,7 @@ comparison_op
 
 value
    = STRING
-   / NUMBER
+   / minus:MINUS? nbr:NUMBER { return (minus === '-' ? -1 : 1) * parseFloat(nbr)}
    / TRUE
    / FALSE
    / NULL
