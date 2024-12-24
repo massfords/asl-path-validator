@@ -63,7 +63,10 @@ intrinsic_function
     / func:"States.StringToJson" args:single_arg {return {func, args}}
     / func:"States.JsonToString" args:single_arg {return {func, args}}
     / func:"States.MathRandom" args:function_args {return {func, args}}
-    / func:"States.MathAdd" args:function_args {return {func, args}}
+    / func:"States.MathAdd" PAREN_LEFT _ arg1:jsonpath_ _ COMMA _ arg2:jsonpath_ _ PAREN_RIGHT {return {func, arg1, arg2}}
+    / func:"States.MathAdd" PAREN_LEFT _ arg1:jsonpath_ _ COMMA _ arg2:(MINUS? NUMBER) _ PAREN_RIGHT {return {func, arg1, arg2}}
+    / func:"States.MathAdd" PAREN_LEFT _ arg1:(MINUS? NUMBER) _ COMMA _ arg2:jsonpath_ _ PAREN_RIGHT {return {func, arg1, arg2}}
+    / func:"States.MathAdd" PAREN_LEFT _ arg1:(MINUS? NUMBER) _ COMMA _ arg2:(MINUS? NUMBER) _ PAREN_RIGHT {return {func, arg1, arg2}}
     / func:"States.StringSplit" args:function_args {return {func, args}}
     / func:"States.UUID" args:no_args {return {func, args}}
 	/ func:"States.Format" args:function_args {return {func, args}}

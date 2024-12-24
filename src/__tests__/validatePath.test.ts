@@ -133,6 +133,38 @@ describe("unit tests for the parser", () => {
       valid_in: PayloadTemplatesOnly,
     },
     {
+      path: "States.MathAdd($.value1, -1)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd($.value1, 1)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd(1, -1)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd(-1, -1)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd(1, $.step)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd(-1, $.step)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
+      path: "States.MathAdd('-1', 'abc')",
+      valid_in: None,
+    },
+    {
+      path: "States.MathAdd(States.ArrayLength($$.Execution.Input.machines),-1)",
+      valid_in: PayloadTemplatesOnly,
+    },
+    {
       path: "States.StringSplit($.inputString, $.splitter)",
       valid_in: PayloadTemplatesOnly,
     },
