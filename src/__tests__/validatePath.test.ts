@@ -216,6 +216,10 @@ describe("unit tests for the parser", () => {
     { path: "$.book[?(@.author =~ /.*REES/i)]", valid_in: None },
     { path: "$..*", valid_in: NoRefPaths },
     { path: "..book.length()", valid_in: None },
+    {
+      path: "$[?(@.key1 == pass)].key1.thing2",
+      valid_in: [AslPathContext.PATH, AslPathContext.PAYLOAD_TEMPLATE],
+    },
   ];
   interface TestInputForContext {
     path: string;
