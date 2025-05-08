@@ -220,6 +220,10 @@ describe("unit tests for the parser", () => {
       path: "$[?(@.key1 == pass)].key1.thing2",
       valid_in: [AslPathContext.PATH, AslPathContext.PAYLOAD_TEMPLATE],
     },
+    {
+      path: "$[?(@.key1.thing1 == pass)]",
+      valid_in: [AslPathContext.PATH, AslPathContext.PAYLOAD_TEMPLATE],
+    },
   ];
   interface TestInputForContext {
     path: string;
