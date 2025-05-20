@@ -115,6 +115,7 @@ expression
 expression_
    = PAREN_LEFT _ exp:expression _ PAREN_RIGHT {return {exp}}
    / path:jsonpath__ _ op:comparison_op _ minus:MINUS? val:NUMBER {return {path, op, val: minus==='-'?-val:val}}
+   / path:jsonpath__ _ op:comparison_op _ ID {return {path, op}}
    / path:jsonpath__
 
 comparison_op
