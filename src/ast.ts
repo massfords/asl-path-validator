@@ -1,24 +1,33 @@
-import { JSONPath } from "jsonpath-plus";
+import jsonata from "jsonata";
 
-const find = (path: string, ast: unknown): boolean => {
-  const results: unknown[] = JSONPath({
-    path,
-    json: ast as object,
-  });
-  return results.length > 0;
+const find = async (fields: string[], ast: unknown): Promise<boolean> => {
+  for (const field of fields) {
+    const expr = jsonata(`**.${field}`);
+    const result: unknown = await expr.evaluate(ast);
+    if (result) {
+      return true;
+    }
+  }
+  return false;
 };
 
-export const referencePathChecks = (ast: unknown): boolean => {
-  return !find(
-    "$..[atmark,wildcard,negOffset,slice,recursiveDescent,multipleIndex,filter]",
-    ast
-  );
+export const referencePathChecks = async (ast: unknown): Promise<boolean> => {
+  const names = [
+    "atmark",
+    "wildcard",
+    "negOffset",
+    "slice",
+    "recursiveDescent",
+    "multipleIndex",
+    "filter",
+  ];
+  return !(await find(names, ast));
 };
 
-export const hasFunctions = (ast: unknown): boolean => {
-  return find("$..[func]", ast);
+export const hasFunctions = async (ast: unknown): Promise<boolean> => {
+  return find(["func"], ast);
 };
 
-export const hasVariable = (ast: unknown): boolean => {
-  return find("$..[var]", ast);
+export const hasVariable = async (ast: unknown): Promise<boolean> => {
+  return find(["var"], ast);
 };

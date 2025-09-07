@@ -4,10 +4,10 @@ import { parse } from "./generated/aslPaths";
 import { AslPathContext, ErrorCodes, ValidationResult } from "./types";
 import { hasFunctions, hasVariable, referencePathChecks } from "./ast";
 
-export const validatePath = (
+export const validatePath = async (
   path: string,
   context: AslPathContext
-): ValidationResult => {
+): Promise<ValidationResult> => {
   let ast: unknown | null = null;
   try {
     ast = parse(path);
@@ -29,7 +29,7 @@ export const validatePath = (
     case AslPathContext.PAYLOAD_TEMPLATE:
       break;
     case AslPathContext.PATH:
-      if (hasFunctions(ast)) {
+      if (await hasFunctions(ast)) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_functions,
@@ -38,20 +38,20 @@ export const validatePath = (
       break;
     case AslPathContext.REFERENCE_PATH:
     case AslPathContext.RESULT_PATH:
-      if (hasFunctions(ast)) {
+      if (await hasFunctions(ast)) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_functions,
         };
       }
-      if (!referencePathChecks(ast)) {
+      if (!(await referencePathChecks(ast))) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_non_reference_path_ops,
         };
       }
       if (context === AslPathContext.RESULT_PATH) {
-        if (hasVariable(ast)) {
+        if (await hasVariable(ast)) {
           return {
             isValid: false,
             code: ErrorCodes.exp_has_variable,
