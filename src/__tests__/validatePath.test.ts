@@ -248,10 +248,10 @@ describe("unit tests for the parser", () => {
   describe("valid paths", () => {
     it.each(toInput())(
       "$path as $context expected: $expected_outcome",
-      async ({ path, context, expected_outcome }) => {
+      ({ path, context, expected_outcome }) => {
         expect.hasAssertions();
         must(context);
-        const result = await validatePath(path, context);
+        const result = validatePath(path, context);
         if (!result.isValid && expected_outcome) {
           // gets a better error message
           expect(result.message).toBeFalsy();
