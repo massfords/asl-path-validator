@@ -2,12 +2,12 @@
 // @ts-ignore
 import { parse } from "./generated/aslPaths";
 import { AslPathContext, ErrorCodes, ValidationResult } from "./types";
-import { hasFunctions, hasVariable, referencePathChecks } from "./ast";
+import { gather } from "./ast";
 
-export const validatePath = async (
+export const validatePath = (
   path: string,
   context: AslPathContext
-): Promise<ValidationResult> => {
+): ValidationResult => {
   let ast: unknown | null = null;
   try {
     ast = parse(path);
@@ -25,11 +25,12 @@ export const validatePath = async (
       message: "no ast returned",
     };
   }
+  const fields = gather(ast);
   switch (context) {
     case AslPathContext.PAYLOAD_TEMPLATE:
       break;
     case AslPathContext.PATH:
-      if (await hasFunctions(ast)) {
+      if (fields.hasFunc) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_functions,
@@ -38,20 +39,20 @@ export const validatePath = async (
       break;
     case AslPathContext.REFERENCE_PATH:
     case AslPathContext.RESULT_PATH:
-      if (await hasFunctions(ast)) {
+      if (fields.hasFunc) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_functions,
         };
       }
-      if (!(await referencePathChecks(ast))) {
+      if (fields.hasInvalidReferencePathOps) {
         return {
           isValid: false,
           code: ErrorCodes.exp_has_non_reference_path_ops,
         };
       }
       if (context === AslPathContext.RESULT_PATH) {
-        if (await hasVariable(ast)) {
+        if (fields.hasVar) {
           return {
             isValid: false,
             code: ErrorCodes.exp_has_variable,

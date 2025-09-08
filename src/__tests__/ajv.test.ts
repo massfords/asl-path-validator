@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import Ajv, { type ErrorObject } from "ajv";
 import example from "./json/example-schema.json";
 import payloadTemplateSchema from "./json/payload-template.json";
 import fs from "fs";
@@ -11,10 +11,7 @@ describe("tests for the ajv custom formatters", () => {
 
   beforeAll(() => {
     ajv = new Ajv({
-      schemas: [
-        { ...example, $async: true },
-        { ...payloadTemplateSchema, $async: true },
-      ],
+      schemas: [example, payloadTemplateSchema],
       allowUnionTypes: true,
     });
     registerAll(ajv);
@@ -41,18 +38,17 @@ describe("tests for the ajv custom formatters", () => {
     },
   ];
 
-  it.each(valid_inputs)("$label", async (inputWithLabel) => {
+  it.each(valid_inputs)("$label", (inputWithLabel) => {
     expect.hasAssertions();
     must(ajv);
     const { label, ...input } = inputWithLabel;
-    const validator = ajv.getSchema(
-      "https://asl-path-validator.cloud/example.json#"
+    const result = ajv.validate(
+      "https://asl-path-validator.cloud/example.json#",
+      input
     );
-    must(validator);
-    const result = await validator(input);
     expect(label).toBeTruthy();
     expect(ajv.errors ?? []).toStrictEqual([]);
-    expect(result).toBeTruthy();
+    expect(result).toBe(true);
   });
 
   const invalid_shapes: Array<{
@@ -82,7 +78,7 @@ describe("tests for the ajv custom formatters", () => {
         "dynamic.path1.$": "not a valid path",
         static2: "ok",
       },
-      label: "field matching path pattern doesn't have a valid path",
+      label: "field matching path pattern doesn't have a valud path",
     },
     {
       Parameters: {
@@ -108,32 +104,22 @@ describe("tests for the ajv custom formatters", () => {
     },
   ];
 
-  it.each(invalid_shapes)(
-    "$label should be rejected",
-    async (inputWithLabel) => {
-      expect.hasAssertions();
-      must(ajv);
-      const { label, ...input } = inputWithLabel;
-      expect(label).toBeTruthy();
-      const inputFields = Object.keys(input);
-      expect(inputFields).toHaveLength(1);
-      const validator = ajv.getSchema(
-        "https://asl-path-validator.cloud/example.json#"
-      );
-      must(validator);
-      try {
-        await validator({ ...input, Type: "Example" });
-        fail("expected validation to fail");
-      } catch (e: unknown) {
-        expect(e).toBeTruthy();
-      }
-      // const instancePath: string = JSONPath({
-      //   json: ajv,
-      //   path: "$.errors.[0].instancePath",
-      //   wrap: false,
-      // });
-      //
-      // expect(instancePath.split("/")[1]).toStrictEqual(inputFields[0]);
-    }
-  );
+  it.each(invalid_shapes)("$label should be rejected", (inputWithLabel) => {
+    expect.hasAssertions();
+    must(ajv);
+    const { label, ...input } = inputWithLabel;
+    expect(label).toBeTruthy();
+    const inputFields = Object.keys(input);
+    expect(inputFields).toHaveLength(1);
+    const result = ajv.validate(
+      "https://asl-path-validator.cloud/example.json#",
+      { ...input, Type: "Example" }
+    );
+    expect(result).toBe(false);
+    const instancePath: string = (
+      (ajv.errors as ErrorObject[])[0] as ErrorObject
+    ).instancePath;
+
+    expect(instancePath.split("/")[1]).toStrictEqual(inputFields[0]);
+  });
 });
